@@ -2,11 +2,12 @@ package de.devboost.audioserver.tts;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFileFormat.Type;
 
 import com.sun.speech.freetts.VoiceManager;
 import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
@@ -16,10 +17,13 @@ public class Voice {
 	private com.sun.speech.freetts.Voice systemVoice;
 	private String name;
 
+	private static final Type audioType = AudioFileFormat.Type.WAVE;
+
 	public Voice(String name) {
 		this.name = name;
 		this.systemVoice = VoiceManager.getInstance().getVoice(this.name);
 		this.systemVoice.allocate();
+
 	}
 
 	public void speakToSpeaker(String thingToSay) {
@@ -27,43 +31,62 @@ public class Voice {
 	}
 
 	public byte[] speakToWAV(String thingToSay) {
-		Path tmpDir = null;
+		File tmpFile;
 		try {
-			 tmpDir = Files.createTempDirectory("audioberry");
+			tmpFile = createTempWAVFile();
 		} catch (IOException e1) {
-			return null;
+			throw new RuntimeException("Huih, cannot create temporary file.");
 		}
-		
-		Path tmpFile = Paths.get(tmpDir.toString(), "output");
-		
-		SingleFileAudioPlayer audioPlayer = new SingleFileAudioPlayer(tmpFile.toString(), javax.sound.sampled.AudioFileFormat.Type.WAVE);
+
+		SingleFileAudioPlayer audioPlayer;
+		audioPlayer = new SingleFileAudioPlayer(getBaseName(tmpFile), audioType);
+
 		systemVoice.setAudioPlayer(audioPlayer);
-		
 		systemVoice.speak(thingToSay);
-//		systemVoice.deallocate();
+
 		audioPlayer.close();
-		
+
+		return writeFileToByteArray(tmpFile);
+	}
+
+	private byte[] writeFileToByteArray(File tmpFile) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream(Paths.get(tmpFile.toString() + ".wav").toFile()));
-			
+			BufferedInputStream in = new BufferedInputStream(
+					new FileInputStream(tmpFile));
+
 			int read;
 			byte[] buf = new byte[1024];
-			
+
 			while ((read = in.read(buf)) > 0) {
 				out.write(buf, 0, read);
 			}
 			out.flush();
 			in.close();
-			
+
 			return out.toByteArray();
-		
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
-	
+
+	private File createTempWAVFile() throws IOException {
+		String extension = "." + getExtension();
+		return File.createTempFile("audioberry", extension);
+	}
+
+	protected String getBaseName(File file) {
+		String filePath = file.getAbsolutePath();
+		int lastIndex = filePath.indexOf(getExtension());
+
+		return filePath.substring(0, lastIndex-1);
+	}
+
+	protected String getExtension() {
+		return audioType.getExtension();
+	}
+
 }
