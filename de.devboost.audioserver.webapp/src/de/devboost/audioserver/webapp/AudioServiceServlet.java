@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 
-public class AudioServlet extends HttpServlet {
+import de.devboost.audioserver.tts.Voice;
+
+public class AudioServiceServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -30,7 +32,7 @@ public class AudioServlet extends HttpServlet {
 			byte[] waveFile = getWaveFile(text);
 			for (AudioServiceMessageInbound inbound : inbounds) {
 				String waveBase64 = Base64.encodeBase64String(waveFile);
-				String message = "{ text : \"" + text + "\" , audio : \"" + waveBase64 + "\"}";
+				String message = "{ \"text\" : \"" + text + "\" , \"audio\" : \"" + waveBase64 + "\"}";
 				inbound.push(message);
 			}
 		}
@@ -40,6 +42,6 @@ public class AudioServlet extends HttpServlet {
 	}
 
 	private byte[] getWaveFile(String text) {
-		return new byte[20];
+		return new Voice("kevin16").speakToWAV(text);
 	}
 }

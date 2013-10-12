@@ -12,3 +12,4 @@ Bundle-ClassPath: .,
  lib/cmu_us_kal.jar,
  lib/cmulex.jar,
  lib/en_us.jar
+Export-Package: de.devboost.audioserver.tts

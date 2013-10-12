@@ -18,7 +18,7 @@ public class AudioServiceMessageInbound extends MessageInbound {
 	public AudioServiceMessageInbound(int byteBufferMaxSize, int charBufferMaxSize) {
 
 		super();
-		AudioServlet.addInbound(this);
+		AudioServiceServlet.addInbound(this);
 		setByteBufferMaxSize(byteBufferMaxSize);
 		setCharBufferMaxSize(charBufferMaxSize);
 	}
@@ -64,7 +64,7 @@ public class AudioServiceMessageInbound extends MessageInbound {
 		logger.entering(AudioServiceMessageInbound.class.getName(), "onTextMessage");
 
 		//String message = messageBuffer.toString();
-		push("{ text : \"example text\" , audio : \"\" }");
+		push("{ \"text\" : \"example text\" , \"audio\" : \"\" }");
 	}
 
 	public void push(String message) {

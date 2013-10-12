@@ -6,4 +6,5 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: javax.servlet,
  javax.websocket.api_1_0,
- org.apache.tomcat_7_0_42
+ org.apache.tomcat_7_0_42,
+ de.devboost.audioserver.tts

@@ -18,27 +18,15 @@
       -->
     </servlet>
     <servlet>
-      <servlet-name>AudioServlet</servlet-name>
-      <servlet-class>de.devboost.audioserver.webapp.AudioServlet</servlet-class>
-      <!-- Uncomment the following block to increase the default maximum
-           WebSocket buffer size from 2MB to 20MB. -->
-      <!--
-      <init-param>
-        <param-name>byteBufferMaxSize</param-name>
-        <param-value>20971520</param-value>
-      </init-param>
-      <init-param>
-        <param-name>charBufferMaxSize</param-name>
-        <param-value>20971520</param-value>
-      </init-param>
-      -->
+      <servlet-name>AudioServiceServlet</servlet-name>
+      <servlet-class>de.devboost.audioserver.webapp.AudioServiceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
       <servlet-name>AudioWebsocket</servlet-name>
       <url-pattern>/websocket</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-      <servlet-name>AudioServlet</servlet-name>
+      <servlet-name>AudioServiceServlet</servlet-name>
       <url-pattern>/service</url-pattern>
     </servlet-mapping>
 	<welcome-file-list>
