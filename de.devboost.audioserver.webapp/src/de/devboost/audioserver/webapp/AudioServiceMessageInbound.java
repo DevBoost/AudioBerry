@@ -18,6 +18,7 @@ public class AudioServiceMessageInbound extends MessageInbound {
 	public AudioServiceMessageInbound(int byteBufferMaxSize, int charBufferMaxSize) {
 
 		super();
+		AudioServlet.addInbound(this);
 		setByteBufferMaxSize(byteBufferMaxSize);
 		setCharBufferMaxSize(charBufferMaxSize);
 	}
@@ -38,8 +39,7 @@ public class AudioServiceMessageInbound extends MessageInbound {
 	protected void onBinaryMessage(ByteBuffer byteBuffer) throws IOException {
 		logger.entering(AudioServiceMessageInbound.class.getName(), "onBinaryMessage");
 		
-		byte[] bytes = toByteArray(byteBuffer);
-		// TODO
+		// TODO byte[] bytes = toByteArray(byteBuffer);
 	}
 
 	public static Charset charset = Charset.forName("UTF-8");
@@ -64,14 +64,13 @@ public class AudioServiceMessageInbound extends MessageInbound {
 		logger.entering(AudioServiceMessageInbound.class.getName(), "onTextMessage");
 
 		//String message = messageBuffer.toString();
-		push("{ text : \"example text\" , audio : \"\" }".getBytes("UTF-8"));
+		push("{ text : \"example text\" , audio : \"\" }");
 	}
 
-	public void push(byte[] message) {
+	public void push(String message) {
 		try {
-			ByteBuffer wrappedMessage = ByteBuffer.wrap(message);
 			WsOutbound wsOutbound = getWsOutbound();
-			wsOutbound.writeBinaryMessage(wrappedMessage);
+			wsOutbound.writeTextMessage(CharBuffer.wrap(message.toCharArray()));
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Can't push message.", e);
 		}

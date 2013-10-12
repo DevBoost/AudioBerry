@@ -31,7 +31,7 @@ public class AudioServlet extends HttpServlet {
 			for (AudioServiceMessageInbound inbound : inbounds) {
 				String waveBase64 = Base64.encodeBase64String(waveFile);
 				String message = "{ text : \"" + text + "\" , audio : \"" + waveBase64 + "\"}";
-				inbound.push(message.getBytes("UTF-8"));
+				inbound.push(message);
 			}
 		}
 		

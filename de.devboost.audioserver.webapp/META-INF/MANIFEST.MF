@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Webapp
 Bundle-SymbolicName: de.devboost.audioserver.webapp
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: javax.servlet,
  javax.websocket.api_1_0,
  org.apache.tomcat_7_0_42
