@@ -2,7 +2,6 @@ package de.devboost.audioserver.tts;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +45,7 @@ public class Voice {
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File("output.wav")));
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(Paths.get(tmpFile.toString() + ".wav").toFile()));
 			
 			int read;
 			byte[] buf = new byte[1024];

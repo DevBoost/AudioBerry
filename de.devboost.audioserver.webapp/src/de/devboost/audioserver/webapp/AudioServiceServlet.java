@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,21 +25,35 @@ public class AudioServiceServlet extends HttpServlet {
 	}
 	
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		System.out.println("AudioServiceServlet.init()");
+	}
+	
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException {
 		
+		int clientCount = 0;
 		String text = req.getParameter("text");
 		if (text != null) {
 			byte[] waveFile = getWaveFile(text);
 			for (AudioServiceMessageInbound inbound : inbounds) {
 				String waveBase64 = Base64.encodeBase64String(waveFile);
+				System.out.println("AudioServiceServlet.doGet() " + waveBase64);
 				String message = "{ \"text\" : \"" + text + "\" , \"audio\" : \"" + waveBase64 + "\"}";
 				inbound.push(message);
+				clientCount++;
 			}
 		}
 		
-		resp.getWriter().write("OK");
-		super.doGet(req, resp);
+		resp.setContentType("text/html");
+		try {
+			resp.getWriter().write("Sent WAV file to " + clientCount + " client(s).");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private byte[] getWaveFile(String text) {
