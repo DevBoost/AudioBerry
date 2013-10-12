@@ -36,12 +36,17 @@ public class AudioServiceServlet extends HttpServlet {
 		
 		int clientCount = 0;
 		String text = req.getParameter("text");
+		String color = req.getParameter("color");
 		if (text != null) {
 			byte[] waveFile = getWaveFile(text);
 			for (AudioServiceMessageInbound inbound : inbounds) {
 				String waveBase64 = Base64.encodeBase64String(waveFile);
 				System.out.println("AudioServiceServlet.doGet() " + waveBase64);
-				String message = "{ \"text\" : \"" + text + "\" , \"audio\" : \"" + waveBase64 + "\"}";
+				String colorText = null;
+				if (color != null) {
+					colorText = ", \"color\" : \"" + color +"\"";
+				}
+				String message = "{ \"text\" : \"" + text + "\" , \"audio\" : \"" + waveBase64 + "\" " + (colorText != null ? colorText : "") + "}";
 				inbound.push(message);
 				clientCount++;
 			}
