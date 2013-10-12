@@ -1,4 +1,5 @@
 git:https://github.com/DevBoost/BuildBoost.git!Extensions/WebAppPackaging/
+svn:file://localhost/srv/svn/master/trunk/Development/BuildBoostExtensions/de.devboost.buildboost.genext.antinstalls
 
 svn:file://localhost/srv/svn/master/trunk/Development/ThirdPartyComponents/javax.servlet_2_5_0
 svn:file://localhost/srv/svn/master/trunk/Development/ThirdPartyComponents/javax.websocket.api_1_0
