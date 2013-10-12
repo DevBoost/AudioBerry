@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,500,600,700,900' rel='stylesheet' type='text/css'>
+    <script type="text/javascript">
+        var connection = new WebSocket('ws://devboost.de:8443/de.devboost.audioserver.webapp/websocket', ['soap', 'xmpp']);
+
+        connection.onopen = function () {
+            console.log("connected", connection.readyState);
+            connection.send("");
+        };
+        connection.onerror = function (error) {
+            console.log('WebSocket Error ' + error);
+        };
+        connection.binaryType = 'arraybuffer';
+        connection.onmessage = function (e) {
+            console.log('Server: ' + e.data);
+            var dataObj = $.parseJSON(e.data);
+            $("#text").html(dataObj.text);
+            if (dataObj.color) {
+                $("body").css("background-color","#"+dataObj.color);
+            }
+            else {
+                $("body").css("background-color","#2c3e50");
+            }
+        };
+    </script>
+    <style type="text/css">
+        body {
+            background: #2c3e50;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        h1 {
+            color: white;
+            font-size: 5em;
+            font-weight: normal;
+            text-align: center;
+            margin-top: 300px;
+        }
+    </style>
+</head>
+<body>
+<audio></audio>
+<h1 id="text">Nix los hier</h1>
+</body>
+</html>
