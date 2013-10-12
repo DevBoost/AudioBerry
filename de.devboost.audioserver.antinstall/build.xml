@@ -43,10 +43,6 @@
 		<!-- Extract tomcat to home directory -->
 		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
 			command="cd ${home} &amp;&amp; tar xvfz ${home}/${tomcat-archive}"/>
-		<!-- Adjust context.xml (locally) -->
-		<replace file="resources/context.xml" token="#dbname#" value="${dbname}"></replace>
-		<replace file="resources/context.xml" token="#dbusername#" value="${dbuser}"></replace>
-		<replace file="resources/context.xml" token="#dbpassword#" value="${dbpass}"></replace>
 		<!-- Upload custom server.xml file -->
 		<scp knownhosts="${hosts}" port="${port}" todir="${username}:${password}@${host}:${home}/${tomcat-folder}/conf/server.xml" file="resources/server.xml"></scp>
 		<!-- Remove Tomcat archive -->
