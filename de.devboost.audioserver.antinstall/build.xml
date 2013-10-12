@@ -1,0 +1,88 @@
+<project name="de.onquality.scanner.deploy" default="dist" basedir=".">
+	
+	<property name="home" value="/home/onquality/printandpack"/>
+	<property name="port" value="22"/>
+	<property name="tomcat-folder" value="apache-tomcat-7.0.42"/>
+	<property name="tomcat-archive" value="apache-tomcat-7.0.42.tar.gz"/>
+	<property name="hosts" value="resources/known_hosts_onquality"/>
+	<property name="war-archive" value="de.devboost.audioserver.webapp.war"/>
+	<property name="backup-folder" value="${home}/backups"/>
+
+	<!-- Check properties that are used for parameterization of this script -->
+	<target name="checkproperties">
+		<fail unless="host">Property 'host' is not set.</fail>
+		<fail unless="username">Property 'username' is not set.</fail>
+		<fail unless="password">Property 'password' is not set.</fail>
+	</target>
+	
+	<target name="dist" depends="checkproperties">
+		<antcall target="clean-all" />		
+		<antcall target="upload-tomcat" />
+		<antcall target="upload-war" />
+		<antcall target="start-tomcat" />
+	</target>
+	
+	<!-- Create backup and remove all files afterwards. -->
+	<target name="clean-all">
+		<antcall target="backup" />
+		<antcall target="clean-tomcat" />
+	</target>
+
+	<!-- Shutdown and remove Tomcat -->
+	<target name="clean-tomcat" depends="checkproperties">
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="if test -f ${home}/${tomcat-folder}/bin/catalina.sh ; then ${home}/${tomcat-folder}/bin/catalina.sh stop ; fi"/>
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="rm -rf ${home}/${tomcat-folder}"/>
+	</target>
+	
+	<!-- Upload and extract Tomcat -->
+	<target name="upload-tomcat" depends="checkproperties">
+		<!-- Upload archive containing Tomcat -->
+		<scp knownhosts="${hosts}" port="${port}" todir="${username}:${password}@${host}:${home}" file="resources/${tomcat-archive}"></scp>
+		<!-- Extract tomcat to home directory -->
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="cd ${home} &amp;&amp; tar xvfz ${home}/${tomcat-archive}"/>
+		<!-- Adjust context.xml (locally) -->
+		<replace file="resources/context.xml" token="#dbname#" value="${dbname}"></replace>
+		<replace file="resources/context.xml" token="#dbusername#" value="${dbuser}"></replace>
+		<replace file="resources/context.xml" token="#dbpassword#" value="${dbpass}"></replace>
+		<!-- Upload custom server.xml file -->
+		<scp knownhosts="${hosts}" port="${port}" todir="${username}:${password}@${host}:${home}/${tomcat-folder}/conf/server.xml" file="resources/server.xml"></scp>
+		<!-- Remove Tomcat archive -->
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="rm ${home}/${tomcat-archive}"/>
+	</target>
+		
+	<!-- Upload WAR -->
+	<target name="upload-war" depends="checkproperties">
+		<scp knownhosts="${hosts}" port="${port}" todir="${username}:${password}@${host}:${home}" file="artifacts/webapps/${war-archive}"></scp>
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="cp ${home}/${war-archive} ${home}/${tomcat-folder}/webapps"/>
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="rm ${home}/${war-archive}"/>
+	</target>
+	
+	<!-- Start Tomcat -->
+	<target name="start-tomcat" depends="checkproperties">
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="${home}/${tomcat-folder}/bin/catalina.sh start"/>
+	</target>
+	
+	<!-- Backup all data -->
+	<target name="backup" depends="checkproperties,make-backups-folder">
+		<tstamp>
+			<format property="backup-tstamp" pattern="yyyyMMdd-HHmmss" />
+		</tstamp>
+		
+		<!-- Tar and zip everything except previous backups -->
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="cd ${home} &amp;&amp; tar -cvzf ${backup-folder}/backup-${backup-tstamp}.tar.gz --exclude='backups' ."/>
+	</target>
+	
+	<target name="make-backups-folder" depends="checkproperties">
+		<sshexec host="${host}" port="${port}" knownhosts="${hosts}" username="${username}" password="${password}"
+			command="test -d ${backup-folder} || mkdir -p ${backup-folder}"/>
+	</target>
+
+</project>
