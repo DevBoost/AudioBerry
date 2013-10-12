@@ -1,0 +1,3 @@
+git:https://github.com/DevBoost/BuildBoost.git!Extensions/WebAppPackaging/
+
+svn:file://localhost/srv/svn/master/trunk/Development/ThirdPartyComponents/javax.servlet_2_5_0
